@@ -242,9 +242,9 @@ section { padding: 6.5rem 1.5rem; max-width: var(--container); margin: 0 auto; }
 .review-carousel { overflow: hidden; }
 .review-track { display: flex; transition: transform 0.6s var(--ease); }
 .review-card {
-  flex: 0 0 100%; margin: 0; padding: 2.4rem; text-align: center; max-width: 680px; margin-inline: auto;
+  flex: 0 0 100%; margin: 0; padding: 2.4rem; text-align: center;
 }
-.review-card p { font-family: var(--serif); font-size: clamp(1.2rem, 2.4vw, 1.6rem); color: var(--ink); font-style: italic; }
+.review-card p { max-width: 680px; margin-inline: auto; font-family: var(--serif); font-size: clamp(1.2rem, 2.4vw, 1.6rem); color: var(--ink); font-style: italic; }
 .review-card cite { font-style: normal; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold-soft); }
 .review-dots { display: flex; justify-content: center; gap: 0.6rem; margin-top: 1.5rem; }
 .review-dots button {
