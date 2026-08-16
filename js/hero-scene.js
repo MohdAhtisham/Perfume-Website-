@@ -1,5 +1,12 @@
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+function showHeroFallback() {
+  const fallback = document.getElementById('heroFallback');
+  if (fallback) fallback.style.display = 'block';
+  const dragHint = document.getElementById('dragHint');
+  if (dragHint) dragHint.style.display = 'none';
+}
+
 function initHeroScene(THREE, RoomEnvironment) {
   const canvas = document.getElementById('bottleCanvas');
   if (!canvas) return;
@@ -138,20 +145,34 @@ function initHeroScene(THREE, RoomEnvironment) {
   });
 
   /* bail out to the static fallback if this device/sandbox can't render
-     fast enough — a slow WebGL path is worse than no 3D scene at all */
+     fast enough — a slow WebGL path is worse than no 3D scene at all.
+     This has to measure real frame-to-frame wall-clock time (the rAF
+     timestamp), not just how long the synchronous renderer.render() call
+     takes to return — WebGL draw calls are asynchronous, so a GPU-bound
+     stall (e.g. from environment-map sampling on a software renderer)
+     shows up as a late next rAF callback, not a slow render() call. */
   let frameCount = 0;
   let frameTimeTotal = 0;
+  let lastFrameStamp = null;
   let bailed = false;
-  const PERF_SAMPLE_FRAMES = 20;
+  const PERF_SAMPLE_FRAMES = 12;
   const PERF_BAIL_MS = 60; // ~ under 17fps sustained
 
   function animate(now) {
     if (bailed) return;
     rafId = requestAnimationFrame(animate);
-    if (!running) return;
+    if (!running) {
+      lastFrameStamp = null;
+      return;
+    }
+
+    if (lastFrameStamp !== null) {
+      frameCount += 1;
+      frameTimeTotal += now - lastFrameStamp;
+    }
+    lastFrameStamp = now;
 
     const dt = clock.getDelta();
-    const frameStart = performance.now();
 
     if (autoRotate && !dragging) velocity += dt * 0.12;
     velocity *= 0.94;
@@ -162,8 +183,6 @@ function initHeroScene(THREE, RoomEnvironment) {
 
     renderer.render(scene, camera);
 
-    frameCount += 1;
-    frameTimeTotal += performance.now() - frameStart;
     if (frameCount === PERF_SAMPLE_FRAMES) {
       const avg = frameTimeTotal / PERF_SAMPLE_FRAMES;
       if (avg > PERF_BAIL_MS) {
@@ -171,8 +190,7 @@ function initHeroScene(THREE, RoomEnvironment) {
         cancelAnimationFrame(rafId);
         renderer.dispose();
         canvas.style.display = 'none';
-        const fallback = document.getElementById('heroFallback');
-        if (fallback) fallback.style.display = 'block';
+        showHeroFallback();
       }
     }
   }
@@ -188,9 +206,8 @@ function initHeroScene(THREE, RoomEnvironment) {
 }
 
 async function boot() {
-  const fallback = document.getElementById('heroFallback');
   if (!('WebGLRenderingContext' in window)) {
-    fallback.style.display = 'block';
+    showHeroFallback();
     return;
   }
   try {
@@ -200,7 +217,7 @@ async function boot() {
     ]);
     initHeroScene(THREE, RoomEnvironment);
   } catch (err) {
-    fallback.style.display = 'block';
+    showHeroFallback();
   }
 }
 
