@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Noir Essence — Fine Fragrance</title>
+<meta name="description" content="Noir Essence — an interactive 3D showcase of fine perfumes crafted from rare botanicals." />
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✦</text></svg>" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="css/style.css" />
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a href="#top" class="logo">NOIR <span>ESSENCE</span></a>
+
+    <nav class="main-nav" id="mainNav" aria-label="Primary">
+      <ul>
+        <li><a href="#collection">Collection</a></li>
+        <li><a href="#craft">Craft</a></li>
+        <li><a href="#notes">Notes</a></li>
+        <li><a href="#reviews">Reviews</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <button class="icon-btn" id="cartBtn" aria-label="View bag" aria-haspopup="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mainNav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <canvas id="bottleCanvas" class="hero-canvas" aria-hidden="true"></canvas>
+    <div class="hero-fallback" id="heroFallback" aria-hidden="true">
+      <svg viewBox="0 0 120 220" class="fallback-bottle">
+        <path d="M45 12h30l2 20-8 10v18l14 12v110a10 10 0 0 1-10 10H47a10 10 0 0 1-10-10V72l14-12V42l-8-10Z" fill="url(#g1)" stroke="#d4af6a" stroke-width="1.5"/>
+        <rect x="48" y="4" width="24" height="14" rx="3" fill="#d4af6a"/>
+        <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#caa46a" stop-opacity=".55"/><stop offset="1" stop-color="#2a1c10" stop-opacity=".55"/></linearGradient></defs>
+      </svg>
+    </div>
+
+    <div class="hero-content">
+      <p class="eyebrow reveal">Est. in scent, made for skin</p>
+      <h1 class="reveal">A fragrance<br />you can <em>see</em>.</h1>
+      <p class="hero-copy reveal">Noir Essence blends rare botanicals with modern perfumery — drag the bottle, breathe it in, choose your signature.</p>
+      <div class="hero-cta reveal">
+        <a href="#collection" class="btn btn-primary">Explore the Collection</a>
+        <a href="#craft" class="btn btn-ghost">Our Craft</a>
+      </div>
+      <p class="hero-hint reveal">✦ drag to rotate ✦</p>
+    </div>
+
+    <div class="scroll-indicator" aria-hidden="true">
+      <span></span>
+      <small>Scroll</small>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>OUD</span><span>•</span><span>BERGAMOT</span><span>•</span><span>IRIS</span><span>•</span><span>AMBER</span><span>•</span><span>VETIVER</span><span>•</span><span>SANDALWOOD</span><span>•</span><span>ROSE</span><span>•</span><span>MUSK</span><span>•</span>
+      <span>OUD</span><span>•</span><span>BERGAMOT</span><span>•</span><span>IRIS</span><span>•</span><span>AMBER</span><span>•</span><span>VETIVER</span><span>•</span><span>SANDALWOOD</span><span>•</span><span>ROSE</span><span>•</span><span>MUSK</span><span>•</span>
+    </div>
+  </div>
+
+  <!-- COLLECTION -->
+  <section class="collection" id="collection">
+    <div class="section-head reveal">
+      <p class="eyebrow">The Collection</p>
+      <h2>Six scents, one signature waiting</h2>
+    </div>
+
+    <div class="tilt-hint reveal">✦ tilt a card to feel the light move across the glass</div>
+
+    <div class="product-grid" id="productGrid"></div>
+  </section>
+
+  <!-- CRAFT / STORY -->
+  <section class="craft" id="craft">
+    <div class="craft-visual reveal" id="craftVisual">
+      <div class="craft-layer layer-back"></div>
+      <div class="craft-layer layer-mid">
+        <svg viewBox="0 0 200 260" class="craft-bottle">
+          <path d="M78 16h44l3 26-12 14v22l20 16v130a14 14 0 0 1-14 14H81a14 14 0 0 1-14-14V94l20-16V56L75 42Z" fill="url(#g2)" stroke="#d4af6a" stroke-width="1.5"/>
+          <rect x="82" y="6" width="36" height="18" rx="4" fill="#d4af6a"/>
+          <defs><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5a44" stop-opacity=".6"/><stop offset="1" stop-color="#1a1210" stop-opacity=".7"/></linearGradient></defs>
+        </svg>
+      </div>
+      <div class="craft-layer layer-front"></div>
+    </div>
+
+    <div class="craft-text">
+      <p class="eyebrow reveal">Our Craft</p>
+      <h2 class="reveal">Poured slowly.<br />Worn forever.</h2>
+      <p class="reveal">Every Noir Essence bottle begins with a single absolute — hand-extracted, aged in glass, and blended in small batches of under two hundred. No shortcuts, no synthetics standing in for the real thing.</p>
+
+      <div class="craft-stats">
+        <div class="stat reveal">
+          <span class="stat-num" data-count="14">0</span>
+          <span class="stat-label">Days macerating each batch</span>
+        </div>
+        <div class="stat reveal">
+          <span class="stat-num" data-count="98">0</span>
+          <span class="stat-label">% natural origin ingredients</span>
+        </div>
+        <div class="stat reveal">
+          <span class="stat-num" data-count="6">0</span>
+          <span class="stat-label">Signature scents, no more</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOTES -->
+  <section class="notes" id="notes">
+    <div class="section-head reveal">
+      <p class="eyebrow">Anatomy of a Scent</p>
+      <h2>Top. Heart. Base.</h2>
+      <p class="section-sub">Tap a card to flip it and read how each layer unfolds on skin.</p>
+    </div>
+
+    <div class="notes-grid">
+      <button class="flip-card reveal" type="button" data-flip>
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <span class="note-icon">🍋</span>
+            <h3>Top Notes</h3>
+            <p>The first five minutes</p>
+          </div>
+          <div class="flip-face flip-back">
+            <p>Bergamot, pink pepper and citrus peel open bright and fast — the handshake before the story begins.</p>
+          </div>
+        </div>
+      </button>
+
+      <button class="flip-card reveal" type="button" data-flip>
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <span class="note-icon">🌸</span>
+            <h3>Heart Notes</h3>
+            <p>The next few hours</p>
+          </div>
+          <div class="flip-face flip-back">
+            <p>Iris, rose and jasmine settle in once the top fades — the true character of the fragrance.</p>
+          </div>
+        </div>
+      </button>
+
+      <button class="flip-card reveal" type="button" data-flip>
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <span class="note-icon">🪵</span>
+            <h3>Base Notes</h3>
+            <p>Long after you leave the room</p>
+          </div>
+          <div class="flip-face flip-back">
+            <p>Oud, amber and sandalwood anchor everything — the warmth that lingers on a scarf for days.</p>
+          </div>
+        </div>
+      </button>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="reviews" id="reviews">
+    <div class="section-head reveal">
+      <p class="eyebrow">Loved On Skin</p>
+      <h2>What wearers are saying</h2>
+    </div>
+
+    <div class="review-carousel reveal">
+      <div class="review-track" id="reviewTrack">
+        <blockquote class="review-card">
+          <p>"Velvet Oud doesn't announce itself, it lingers. Three compliments before I even left the elevator."</p>
+          <cite>— Amara, Lagos</cite>
+        </blockquote>
+        <blockquote class="review-card">
+          <p>"Midnight Iris is the first scent that's ever felt like it was made for my chemistry specifically."</p>
+          <cite>— Farhan, Dubai</cite>
+        </blockquote>
+        <blockquote class="review-card">
+          <p>"The 3D bottle on the site is half the reason I bought it — then Silk Bergamot sold the other half."</p>
+          <cite>— Priya, London</cite>
+        </blockquote>
+      </div>
+      <div class="review-dots" id="reviewDots"></div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <section class="newsletter" id="contact">
+    <div class="newsletter-inner reveal">
+      <p class="eyebrow">Stay In Scent</p>
+      <h2>Get early access to new blends</h2>
+      <p>No spam — just new fragrance drops and the occasional invitation.</p>
+
+      <form id="newsletterForm" class="newsletter-form" novalidate>
+        <label for="newsletterEmail" class="sr-only">Email address</label>
+        <input type="email" id="newsletterEmail" name="email" placeholder="you@example.com" required />
+        <button type="submit" class="btn btn-primary">Notify Me</button>
+      </form>
+      <p class="form-message" id="formMessage" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="#top" class="logo">NOIR <span>ESSENCE</span></a>
+      <p>Small-batch fine fragrance, poured in the dark and worn in the light.</p>
+      <div class="socials">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+        <a href="#" aria-label="Pinterest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M9 17c1-3 1.5-5.5 1.5-7.5A2.5 2.5 0 0 1 13 7a2.5 2.5 0 0 1 2.5 2.5c0 2-1 4-3 4s-2.5-1.3-2.5-1.3"/></svg></a>
+        <a href="#" aria-label="X"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 4l16 16M20 4 4 20"/></svg></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="#collection">Full Collection</a></li>
+        <li><a href="#collection">Gift Sets</a></li>
+        <li><a href="#craft">Refill Program</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#craft">Our Craft</a></li>
+        <li><a href="#reviews">Reviews</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Help</h4>
+      <ul>
+        <li><a href="#">Shipping</a></li>
+        <li><a href="#">Returns</a></li>
+        <li><a href="#">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; <span id="year"></span> Noir Essence. All rights reserved.</p>
+  </div>
+</footer>
+
+<div class="cart-toast" id="cartToast" role="status" aria-live="polite"></div>
+
+<script src="js/main.js"></script>
+<script type="module" src="js/hero-scene.js"></script>
+</body>
+</html>
