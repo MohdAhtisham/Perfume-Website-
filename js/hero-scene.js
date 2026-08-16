@@ -4,14 +4,14 @@ function initHeroScene(THREE, RoomEnvironment) {
   const canvas = document.getElementById('bottleCanvas');
   if (!canvas) return;
 
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'low-power' });
 
   const hero = canvas.closest('.hero');
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
   camera.position.set(0, 0.4, 7.5);
 
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.1;
 
@@ -34,11 +34,15 @@ function initHeroScene(THREE, RoomEnvironment) {
 
   const bottleGroup = new THREE.Group();
 
+  /* a real "transmission" material forces three.js to render the whole scene
+     a second time into an offscreen target every frame, which is cheap on a
+     dedicated GPU but can bring a software/sandboxed renderer to a crawl —
+     this cheaper opacity + clearcoat combo reads as glass without that cost */
   const glass = new THREE.Mesh(
-    new THREE.LatheGeometry(profile, 48),
+    new THREE.LatheGeometry(profile, 32),
     new THREE.MeshPhysicalMaterial({
-      color: 0xcaa46a, transmission: 1, thickness: 0.6, roughness: 0.06,
-      ior: 1.4, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.1,
+      color: 0xcaa46a, roughness: 0.12, ior: 1.4, metalness: 0,
+      clearcoat: 1, clearcoatRoughness: 0.1, transparent: true, opacity: 0.86,
     })
   );
   glass.position.y = -1.5;
@@ -119,9 +123,35 @@ function initHeroScene(THREE, RoomEnvironment) {
   let autoRotate = !prefersReducedMotion;
   const clock = new THREE.Clock();
 
-  function animate() {
-    requestAnimationFrame(animate);
+  /* pause rendering while the hero is off-screen or the tab is hidden,
+     so a forever-running render loop doesn't burn CPU for no visible gain */
+  let running = false;
+  let rafId = null;
+  let isIntersecting = true;
+  const visibility = new IntersectionObserver(([entry]) => {
+    isIntersecting = entry.isIntersecting;
+    setRunning(isIntersecting && !document.hidden);
+  }, { threshold: 0 });
+  visibility.observe(hero);
+  document.addEventListener('visibilitychange', () => {
+    setRunning(isIntersecting && !document.hidden);
+  });
+
+  /* bail out to the static fallback if this device/sandbox can't render
+     fast enough — a slow WebGL path is worse than no 3D scene at all */
+  let frameCount = 0;
+  let frameTimeTotal = 0;
+  let bailed = false;
+  const PERF_SAMPLE_FRAMES = 20;
+  const PERF_BAIL_MS = 60; // ~ under 17fps sustained
+
+  function animate(now) {
+    if (bailed) return;
+    rafId = requestAnimationFrame(animate);
+    if (!running) return;
+
     const dt = clock.getDelta();
+    const frameStart = performance.now();
 
     if (autoRotate && !dragging) velocity += dt * 0.12;
     velocity *= 0.94;
@@ -131,8 +161,28 @@ function initHeroScene(THREE, RoomEnvironment) {
     bottleGroup.rotation.z += (targetTiltZ - bottleGroup.rotation.z) * 0.06;
 
     renderer.render(scene, camera);
+
+    frameCount += 1;
+    frameTimeTotal += performance.now() - frameStart;
+    if (frameCount === PERF_SAMPLE_FRAMES) {
+      const avg = frameTimeTotal / PERF_SAMPLE_FRAMES;
+      if (avg > PERF_BAIL_MS) {
+        bailed = true;
+        cancelAnimationFrame(rafId);
+        renderer.dispose();
+        canvas.style.display = 'none';
+        const fallback = document.getElementById('heroFallback');
+        if (fallback) fallback.style.display = 'block';
+      }
+    }
   }
-  animate();
+
+  function setRunning(next) {
+    if (next === running) return;
+    running = next;
+    if (running && rafId === null) rafId = requestAnimationFrame(animate);
+  }
+  setRunning(true);
 
   canvas.classList.add('is-ready');
 }

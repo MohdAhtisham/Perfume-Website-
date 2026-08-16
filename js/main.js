@@ -108,17 +108,15 @@ if (statEls.length) {
 /* ================= product card 3D tilt ================= */
 document.addEventListener('pointermove', (e) => {
   const card = e.target.closest?.('[data-tilt]');
-  document.querySelectorAll('.product-card').forEach((el) => {
-    if (el !== card) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width;
-    const py = (e.clientY - r.top) / r.height;
-    const rx = (0.5 - py) * 14;
-    const ry = (px - 0.5) * 16;
-    el.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
-    el.style.setProperty('--mx', `${px * 100}%`);
-    el.style.setProperty('--my', `${py * 100}%`);
-  });
+  if (!card) return;
+  const r = card.getBoundingClientRect();
+  const px = (e.clientX - r.left) / r.width;
+  const py = (e.clientY - r.top) / r.height;
+  const rx = (0.5 - py) * 14;
+  const ry = (px - 0.5) * 16;
+  card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
+  card.style.setProperty('--mx', `${px * 100}%`);
+  card.style.setProperty('--my', `${py * 100}%`);
 }, { passive: true });
 
 document.addEventListener('pointerleave', (e) => {
